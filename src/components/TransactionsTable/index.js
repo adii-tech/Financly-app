@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import './style.css';
 import {Radio, Select, Table } from 'antd';
 import { Transaction } from 'firebase/firestore';
+import { parse, unparse } from 'papaparse';
+import { toast } from 'react-toastify';
 
 
-const TransactionsTable = ({transactions}) => {
+const TransactionsTable = ({transactions, addTransaction, fetchTransactions}) => {
     const {Option}=Select;
     const [search, setSearch]=useState("");
     const [typeFilter, setTypeFilter]=useState("");
@@ -49,6 +51,45 @@ const TransactionsTable = ({transactions}) => {
     }
    })
 
+   function exportCSV(){
+    var csv =unparse({
+        fields:["name", "type","tag","date","amount"],
+        data:transactions,
+    });
+    const blob =new Blob([csv],{type:"text/csv;charset=utf-8;"})
+    const url=URL.createObjectURL(blob);
+    const link=document.createElement("a");
+    link.href=url;
+    link.download="transactions.csv";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+function importfromCsv(event){
+ event.preventDefault();
+ try{
+   parse(event.target.files[0],{
+    header:true,
+    complete: async function (results) {
+       console.log("Results>>>", results) 
+       for(const transaction of results.data){
+        console.log("Transactions", transaction);
+        const newTransaction={
+            ...transaction,
+            amount:parseFloat(transaction.amount),
+        };
+        await addTransaction(newTransaction,true);
+       }
+    },
+   });
+      toast.success("All Transactions Added");
+      fetchTransactions();
+   event.target.files=null;
+ }catch(e){
+    toast.error(e.message);
+ }
+}
+
   return (
     <>
     <div className='search-sort'>
@@ -89,7 +130,7 @@ const TransactionsTable = ({transactions}) => {
     </Radio.Group>
     </div>
     <div className='export-import'>
-        <button className='btn'>Export to CSV</button>
+        <button className='btn' onClick={exportCSV}>Export to CSV</button>
         <label for="file-csv" className='btn btn-blue'>
             Import from CSV
         </label>
@@ -98,6 +139,7 @@ const TransactionsTable = ({transactions}) => {
           type='file'
           accept='.csv'
           required
+          onChange={importfromCsv}
           style={{display:"none"}}
           />
     </div>

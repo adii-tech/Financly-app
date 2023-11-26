@@ -8,8 +8,9 @@ import {useAuthState} from 'react-firebase-hooks/auth';
 import { toast } from 'react-toastify';
 import {addDoc, collection, getDocs, query} from 'firebase/firestore';
 import {db, auth, provider, doc, setDoc} from "../firebase";
-import moment from 'moment';
 import TransactionsTable from '../components/TransactionsTable';
+import ChartComponent from '../components/Charts';
+import NoTransactions from '../components/NoTransactions';
 
 const Dashboard = () => {
 //  const transaction=[
@@ -52,28 +53,28 @@ const Dashboard = () => {
     console.log("On Finish",values, type)
     const newTransaction ={
       type: type,
-      date: moment(values.date).format("YYYY-MM-DD"),
+      date: values.date.format("YYYY-MM-DD"),
       amount: parseFloat(values.amount),
       tag: values.tag,
       name:values.name,
     }
      addTransaction(newTransaction);
  }
- async function addTransaction(transaction){
+ async function addTransaction(transaction, many){
    try{
     const docRef=await addDoc(
       collection(db, `users/${user.uid}/transactions`),
       transaction
     );
      console.log("Document written with ID: ",docRef.id);
-     toast.success("Transaction Added!");
+    if(!many) toast.success("Transaction Added!");
      let newArr=transactions;
      newArr.push(transaction);
      setTransactions(newArr);
      calculateBalance();
    }catch(e){
      console.log("Error adding document: ",e);
-      toast.error("Cauldn't add transaction ")
+     if(!many) toast.error("Cauldn't add transaction ")
    }
  }
 
@@ -115,6 +116,10 @@ const Dashboard = () => {
       setExpense(expensesTotal);
       setTotalBalance(incomeTotal-expensesTotal);
     }
+   let sortedTransactions=transactions.sort((a,b)=>{
+        return new Date(a.date)-new Date(b.date);
+        });
+
   return (
     <div>
         <Header />
@@ -128,7 +133,7 @@ const Dashboard = () => {
          handleExpenseCancel={handleExpenseCancel}
          handleIncomeCancel={handleIncomeCancel}
          />)}
-
+          {transactions.length!=0?<ChartComponent sortedTransactions={sortedTransactions}/>:<NoTransactions/>}
          <AddExpenseModal 
           isExpenseModalVisible={isExpenseModalVisible}
           handleExpenseCancel={handleExpenseCancel}
@@ -139,7 +144,7 @@ const Dashboard = () => {
            handleIncomeCancel={handleIncomeCancel}
            onFinish={onFinish}
          />
-         <TransactionsTable transactions={transactions}/>
+         <TransactionsTable transactions={transactions} addTransaction={addTransaction} fetchTransactions={fetchTransactions}/>
     </div>
   )
 }
