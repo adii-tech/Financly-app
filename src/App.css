@@ -15,4 +15,5 @@
     margin: 2rem;
     border-radius: 0.5rem;
     box-shadow: var(--shadow);
+    gap: 1vw;
 }

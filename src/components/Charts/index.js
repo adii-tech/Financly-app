@@ -13,6 +13,16 @@ const ChartComponent = ({sortedTransactions}) => {
         return {tag: transaction.tag, amount: transaction.amount}
         }
        });
+   
+    // let finalSpendings=spendingData.reduce((acc,obj)=>{
+    //     let key=obj.tag;
+    //     if(!acc[key]){
+    //         acc[key]={tag: obj.tag,amount: obj.amount};
+    //     }else{
+    //         acc[key].amount+=obj.amount;
+    //     }
+    //     return acc;
+    // }, {});
 
     let newSpendings=[
         {tag:"food", amount:0},
@@ -33,13 +43,14 @@ const ChartComponent = ({sortedTransactions}) => {
       const config = {
         data:data,
         width: 500,
-        autoFit:false,
+        autoFit:true,
         xField: 'date',
         yField: 'amount',
       };
       const spendingConfig = {
-        data:newSpendings,
-        width:500,
+         data:newSpendings,
+        // data:finalSpendings,
+        width:100,
         angleField:"amount",
         colorField:"tag",
       };
