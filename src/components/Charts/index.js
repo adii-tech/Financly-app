@@ -14,15 +14,15 @@ const ChartComponent = ({sortedTransactions}) => {
         }
        });
    
-    // let finalSpendings=spendingData.reduce((acc,obj)=>{
-    //     let key=obj.tag;
-    //     if(!acc[key]){
-    //         acc[key]={tag: obj.tag,amount: obj.amount};
-    //     }else{
-    //         acc[key].amount+=obj.amount;
-    //     }
-    //     return acc;
-    // }, {});
+    let finalSpendings=spendingData.reduce((acc,obj)=>{
+        let key=obj.tag;
+        if(!acc[key]){
+            acc[key]={tag: obj.tag,amount: obj.amount};
+        }else{
+            acc[key].amount+=obj.amount;
+        }
+        return acc;
+    }, {});
 
     let newSpendings=[
         {tag:"food", amount:0},
@@ -32,7 +32,7 @@ const ChartComponent = ({sortedTransactions}) => {
     
     spendingData.forEach((item)=>{
         if(item.tag=="food"){
-         newSpendings[0].amount+=item.amount;
+         newSpendings[0].amount +=item.amount;
         }else if(item.tag=="education"){
             newSpendings[1].amount+=item.amount;
         }else{
@@ -48,8 +48,8 @@ const ChartComponent = ({sortedTransactions}) => {
         yField: 'amount',
       };
       const spendingConfig = {
-         data:newSpendings,
-        // data:finalSpendings,
+         //data:newSpendings,
+        data:Object.values(finalSpendings),
         width:100,
         angleField:"amount",
         colorField:"tag",
