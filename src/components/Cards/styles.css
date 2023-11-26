@@ -1,0 +1,11 @@
+.my-card{
+    box-shadow: var(--shadow);
+    min-width: 400px;
+}
+.my-row{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 90%;
+    margin: 2rem auto;
+}
