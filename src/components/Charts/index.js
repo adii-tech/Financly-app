@@ -58,11 +58,11 @@ const ChartComponent = ({sortedTransactions}) => {
       let pieChart;
   return (
     <div className='charts-wrapper'>
-        <div>
+        <div className='chart-1'>
          <h2>Your Analytics</h2>   
       <Line {...config} onReady={(chartInstance)=>(chart=chartInstance)} style={{}}/>
        </div>
-       <div>
+       <div className='chart-2'>
         <h2>Your Spendings</h2>
         <Pie {...spendingConfig}
           onReady={(chartInstance)=>(pieChart=chartInstance)}/>
